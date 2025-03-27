@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Carregando...</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    
+    .container {
+      text-align: center;
+    }
+    
+    .logo-container {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    
+    .logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #0070f3;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="../public/duzzi.png" alt="Duzzi Logo" class="logo">
+    </div>
+    <h1>Monitoramento de Tempo para Montagem de Pedidos</h1>
+    <p>Carregando aplicativo...</p>
+    <div class="spinner"></div>
+  </div>
+</body>
+</html>

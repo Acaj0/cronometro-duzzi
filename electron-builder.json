@@ -1,0 +1,19 @@
+{
+  "appId": "com.duzzi.timetracker",
+  "productName": "Monitoramento de Tempo para Montagem de Pedidos",
+  "directories": {
+    "output": "dist"
+  },
+  "files": ["out/**/*", "public/**/*", "electron/**/*", "package.json"],
+  "mac": {
+    "category": "public.app-category.productivity"
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Utility"
+  }
+}
+
