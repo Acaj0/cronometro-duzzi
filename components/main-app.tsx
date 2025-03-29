@@ -87,7 +87,7 @@ export function MainApp() {
         duration,
       }
 
-      // Remove dos cronômetros ativos
+      // Remove dos cronômetros 
       const updatedActiveTimers = [...activeTimers]
       updatedActiveTimers.splice(timerIndex, 1)
       setActiveTimers(updatedActiveTimers)
