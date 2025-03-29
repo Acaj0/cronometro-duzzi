@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Timer } from "@/components/timer"
 import type { Person, TimeRecord } from "@/lib/types"
 import { Maximize2 } from "lucide-react"
-import Image from "next/image"
 
 interface TimerDashboardProps {
   people: Person[]
@@ -20,17 +19,13 @@ interface TimerDashboardProps {
   logoUrl?: string // URL opcional para o logo
 }
 
-export function TimerDashboard({
-  people,
-  activeTimers,
-  onStartTimer,
-  onStopTimer,
-}: TimerDashboardProps) {
+export function TimerDashboard({ people, activeTimers, onStartTimer, onStopTimer }: TimerDashboardProps) {
   const [selectedPersonId, setSelectedPersonId] = useState("")
   const [orderNumber, setOrderNumber] = useState("")
   const [isDetached, setIsDetached] = useState(false)
   const [isElectron, setIsElectron] = useState(false)
   const [isTimerWindow, setIsTimerWindow] = useState(false)
+  const [localTimers, setLocalTimers] = useState<TimeRecord[]>([])
 
   // Verificar se estamos no Electron e se é uma janela de timer
   // Isso é executado apenas no cliente, evitando erros de hidratação
@@ -38,12 +33,24 @@ export function TimerDashboard({
     setIsElectron(typeof window !== "undefined" && "electron" in window)
 
     if (typeof window !== "undefined" && "electron" in window) {
-      setIsTimerWindow(window.electron.isTimerWindow())
+      const isTimer = window.electron.isTimerWindow()
+      setIsTimerWindow(isTimer)
 
       // Registrar listener para atualização de timers
       const removeListener = window.electron.onTimerUpdate((updatedTimers: TimeRecord[]) => {
         if (window.electron.isTimerWindow()) {
           console.log("Timers atualizados na janela destacada", updatedTimers)
+          // Atualizar os timers locais na janela destacada
+          setLocalTimers(updatedTimers)
+        }
+      })
+
+      // Registrar listener para inicialização da janela de timers
+      const removeInitListener = window.electron.onInitTimerWindow((data) => {
+        if (window.electron.isTimerWindow() && data.timers) {
+          console.log("Inicializando janela de timers com dados", data)
+          // Inicializar os timers locais na janela destacada
+          setLocalTimers(data.timers)
         }
       })
 
@@ -54,20 +61,25 @@ export function TimerDashboard({
 
       return () => {
         if (removeListener) removeListener()
+        if (removeInitListener) removeInitListener()
         if (removeClosedListener) removeClosedListener()
       }
     }
   }, [])
 
+  // Atualizar a janela de timers destacada sempre que os timers ativos mudarem
+  useEffect(() => {
+    if (isElectron && window.electron && isDetached) {
+      console.log("Enviando timers atualizados para a janela destacada:", activeTimers)
+      window.electron.updateTimers(activeTimers)
+    }
+  }, [activeTimers, isElectron, isDetached])
+
   const handleStartTimer = () => {
     if (selectedPersonId && orderNumber.trim()) {
       onStartTimer(selectedPersonId, orderNumber.trim())
       setOrderNumber("")
-      
-      if (isDetached && window.electron) {
-        // Enviar a lista atualizada de timers para a janela destacada
-        window.electron.updateTimers(activeTimers)
-      }
+      // Não precisamos mais chamar updateTimers aqui, pois o useEffect acima cuidará disso
     }
   }
 
@@ -86,20 +98,22 @@ export function TimerDashboard({
 
   // Se estamos na janela de timers, mostrar apenas os timers e o logo
   if (isTimerWindow) {
+    // Usar localTimers em vez de activeTimers na janela destacada
+    const timersToDisplay = localTimers.length > 0 ? localTimers : activeTimers
+
     return (
       <div className="p-6 space-y-6">
-        
         {/* Apenas os cronômetros ativos */}
         <Card>
           <CardHeader>
             <CardTitle>Cronômetros Ativos</CardTitle>
           </CardHeader>
           <CardContent>
-            {activeTimers.length === 0 ? (
+            {timersToDisplay.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">Nenhum cronômetro ativo.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {activeTimers.map((timer) => {
+                {timersToDisplay.map((timer) => {
                   const person = people.find((p) => p.id === timer.personId)
                   return (
                     <Timer
