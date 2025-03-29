@@ -7,12 +7,19 @@ import { TimerDashboard } from "@/components/timer-dashboard"
 import { Reports } from "@/components/reports"
 import type { Person, TimeRecord } from "@/lib/types"
 import { saveData, loadData } from "@/lib/data-service"
-import Image from "next/image"
 
 export function MainApp() {
   const [people, setPeople] = useState<Person[]>([])
   const [timeRecords, setTimeRecords] = useState<TimeRecord[]>([])
   const [activeTimers, setActiveTimers] = useState<TimeRecord[]>([])
+  const [isTimerWindow, setIsTimerWindow] = useState(false)
+
+  // Verificar se estamos na janela de timers
+  useEffect(() => {
+    if (typeof window !== "undefined" && "electron" in window) {
+      setIsTimerWindow(window.electron.isTimerWindow && window.electron.isTimerWindow())
+    }
+  }, [])
 
   // Carrega dados ao montar o componente
   useEffect(() => {
@@ -87,7 +94,7 @@ export function MainApp() {
         duration,
       }
 
-      // Remove dos cronômetros 
+      // Remove dos cronômetros
       const updatedActiveTimers = [...activeTimers]
       updatedActiveTimers.splice(timerIndex, 1)
       setActiveTimers(updatedActiveTimers)
@@ -97,15 +104,27 @@ export function MainApp() {
     }
   }
 
+  // Se estamos na janela de timers, mostrar apenas o logo e os timers
+  if (isTimerWindow) {
+    return (
+      <div className="container mx-auto max-w-6xl">
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-44 h-44 mb-2">
+            <img src="./duzzi.png" alt="Duzzi Logo" className="w-full h-full object-contain" />
+          </div>
+        </div>
+
+        <TimerDashboard people={people} activeTimers={activeTimers} onStartTimer={startTimer} onStopTimer={stopTimer} />
+      </div>
+    )
+  }
+
+  // Interface normal para a janela principal
   return (
     <div className="container mx-auto max-w-6xl">
       <div className="flex flex-col items-center mb-6">
         <div className="w-44 h-44 mb-2">
-          <img 
-            src="./duzzi.png" 
-            alt="Duzzi Logo" 
-            className="w-full h-full object-contain"
-          />
+          <img src="./duzzi.png" alt="Duzzi Logo" className="w-full h-full object-contain" />
         </div>
         <h1 className="text-3xl font-bold text-center">Monitoramento de Tempo para Montagem de Pedidos</h1>
       </div>
@@ -137,3 +156,4 @@ export function MainApp() {
     </div>
   )
 }
+

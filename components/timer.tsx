@@ -14,17 +14,59 @@ interface TimerProps {
 
 export function Timer({ timer, personName, onStop }: TimerProps) {
   const [elapsedTime, setElapsedTime] = useState(0)
+  const [buttonStyle, setButtonStyle] = useState({
+    backgroundColor: "rgb(22, 163, 74)", // Verde inicial
+    color: "white",
+  })
 
   useEffect(() => {
     const startTime = new Date(timer.startTime).getTime()
 
     // Atualiza o tempo decorrido imediatamente
-    setElapsedTime(Math.floor((Date.now() - startTime) / 1000))
+    const updateElapsedTime = () => {
+      const seconds = Math.floor((Date.now() - startTime) / 1000)
+      setElapsedTime(seconds)
+
+      // Calcula a cor com base no tempo decorrido (1 hora = 3600 segundos)
+      const hourProgress = Math.min(seconds / 3600, 1) // Valor entre 0 e 1
+
+      // Transição de cores: verde -> amarelo -> vermelho -> preto
+      let backgroundColor
+      let textColor = "white"
+
+      if (hourProgress < 0.33) {
+        // Verde para amarelo
+        const greenValue = 163 - (163 - 202) * (hourProgress / 0.33)
+        const redValue = 22 + (234 - 22) * (hourProgress / 0.33)
+        backgroundColor = `rgb(${redValue}, ${greenValue}, 74)`
+      } else if (hourProgress < 0.66) {
+        // Amarelo para vermelho
+        const normalizedProgress = (hourProgress - 0.33) / 0.33
+        const greenValue = 202 - 202 * normalizedProgress
+        backgroundColor = `rgb(234, ${greenValue}, 74)`
+      } else {
+        // Vermelho para preto
+        const normalizedProgress = (hourProgress - 0.66) / 0.34
+        const redValue = 234 - 234 * normalizedProgress
+        const greenValue = 74 * (1 - normalizedProgress)
+        backgroundColor = `rgb(${redValue}, ${greenValue}, ${greenValue})`
+
+        // Ajusta a cor do texto para melhor contraste quando o fundo escurece
+        if (normalizedProgress > 0.7) {
+          textColor = "white"
+        }
+      }
+
+      setButtonStyle({
+        backgroundColor,
+        color: textColor,
+      })
+    }
+
+    updateElapsedTime()
 
     // Em seguida, atualiza a cada segundo
-    const interval = setInterval(() => {
-      setElapsedTime(Math.floor((Date.now() - startTime) / 1000))
-    }, 1000)
+    const interval = setInterval(updateElapsedTime, 1000)
 
     return () => clearInterval(interval)
   }, [timer.startTime])
@@ -44,7 +86,7 @@ export function Timer({ timer, personName, onStop }: TimerProps) {
         </div>
       </CardContent>
       <CardFooter className="bg-muted p-2">
-        <Button variant="destructive" className="w-full" onClick={onStop}>
+        <Button onClick={onStop} className="w-full transition-colors duration-300" style={buttonStyle}>
           Finalizar
         </Button>
       </CardFooter>
