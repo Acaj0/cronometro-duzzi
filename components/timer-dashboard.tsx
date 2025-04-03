@@ -75,12 +75,28 @@ export function TimerDashboard({ people, activeTimers, onStartTimer, onStopTimer
     }
   }, [activeTimers, isElectron, isDetached])
 
+  // Add this function inside the TimerDashboard component
+  const personHasActiveTimer = (personId: string) => {
+    return activeTimers.some((timer) => timer.personId === personId)
+  }
+
   const handleStartTimer = () => {
     if (selectedPersonId && orderNumber.trim()) {
+      // Check if the person already has an active timer
+      if (personHasActiveTimer(selectedPersonId)) {
+        // You can add a toast notification here if you have a toast system
+        console.warn("Esta pessoa já possui um cronômetro ativo")
+        return
+      }
+
       onStartTimer(selectedPersonId, orderNumber.trim())
       setOrderNumber("")
-      // Não precisamos mais chamar updateTimers aqui, pois o useEffect acima cuidará disso
     }
+  }
+
+  // Add this function inside the TimerDashboard component
+  const getPeopleWithoutActiveTimers = () => {
+    return people.filter((person) => !personHasActiveTimer(person.id))
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -146,8 +162,8 @@ export function TimerDashboard({ people, activeTimers, onStartTimer, onStopTimer
               </SelectTrigger>
               <SelectContent>
                 {people.map((person) => (
-                  <SelectItem key={person.id} value={person.id}>
-                    {person.name}
+                  <SelectItem key={person.id} value={person.id} disabled={personHasActiveTimer(person.id)}>
+                    {person.name} {personHasActiveTimer(person.id) ? "(Timer ativo)" : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -164,6 +180,26 @@ export function TimerDashboard({ people, activeTimers, onStartTimer, onStopTimer
             <Button onClick={handleStartTimer} disabled={!selectedPersonId || !orderNumber.trim()}>
               Iniciar Cronômetro
             </Button>
+          </div>
+          {/* Add this after the Select component in the "Iniciar Novo Cronômetro" card */}
+          <div className="col-span-full mt-2">
+            <p className="text-sm text-muted-foreground mb-1">Membros disponíveis (sem cronômetros ativos):</p>
+            <div className="flex flex-wrap gap-2">
+              {getPeopleWithoutActiveTimers().map((person) => (
+                <Button
+                  key={person.id}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedPersonId(person.id)}
+                  className="text-xs"
+                >
+                  {person.name}
+                </Button>
+              ))}
+              {getPeopleWithoutActiveTimers().length === 0 && (
+                <p className="text-xs text-muted-foreground">Todos os membros possuem cronômetros ativos.</p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

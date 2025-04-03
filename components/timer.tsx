@@ -75,11 +75,11 @@ export function Timer({ timer, personName, onStop }: TimerProps) {
     <Card className="overflow-hidden">
       <CardContent className="p-4">
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="font-medium">{personName}</span>
-            <span className="text-sm text-muted-foreground">Nota #{timer.orderNumber}</span>
+          <div className="flex flex-col justify-between items-center">
+            <span className="font-bold text-5xl">{personName}</span>
+            <span className="text-xl text-muted-foreground">Nota #{timer.orderNumber}</span>
           </div>
-          <div className="text-3xl font-bold text-center py-4">{formatTime(elapsedTime)}</div>
+          <div className="text-6xl font-bold text-center py-4">{formatTime(elapsedTime)}</div>
           <div className="text-xs text-muted-foreground">
             Iniciado: {new Date(timer.startTime).toLocaleString("pt-BR")}
           </div>
