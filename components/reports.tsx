@@ -283,4 +283,3 @@ export function Reports({ people, timeRecords }: ReportsProps) {
     </Card>
   )
 }
-
