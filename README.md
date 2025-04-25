@@ -37,8 +37,8 @@ Como Rodar o Projeto:
    ```bash
    pnpm dev
    
-Em outro terminal, execute o Electron:
-  ```bash
-  pnpm electron:dev
-  ```
+2. **Em outro terminal, execute o Electron:**
+   ```bash
+   pnpm electron:dev
+   ```
 Importante: Certifique-se de que o servidor Next.js (pnpm dev) esteja rodando antes de abrir o Electron, pois o Electron irá se conectar ao servidor Next.js.
