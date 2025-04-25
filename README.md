@@ -29,20 +29,16 @@ Aplicação de cronômetro personalizada desenvolvida com Electron, Next.js, Tai
 ### Rodar o Electron (modo Desktop)
 
 Como Rodar o Projeto:
+# Como Rodar o Projeto
 
-Rodar o Electron (modo Desktop)
-Inicie o servidor Next.js em modo desenvolvimento:
+### Rodar o Electron (modo Desktop)
 
-bash
-Copiar
-Editar
-pnpm dev
+1. **Inicie o servidor Next.js em modo desenvolvimento:**
+   ```bash
+   pnpm dev
+   
 Em outro terminal, execute o Electron:
-
-bash
-Copiar
-Editar
-pnpm electron:dev
-Isso irá abrir o aplicativo no ambiente Electron, permitindo testar o cronômetro como um app desktop.
-
+  ```bash
+  pnpm electron:dev
+  ```
 Importante: Certifique-se de que o servidor Next.js (pnpm dev) esteja rodando antes de abrir o Electron, pois o Electron irá se conectar ao servidor Next.js.
