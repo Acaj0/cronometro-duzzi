@@ -250,4 +250,3 @@ export function TimerDashboard({ people, activeTimers, onStartTimer, onStopTimer
     </div>
   )
 }
-
