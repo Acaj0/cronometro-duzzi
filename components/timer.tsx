@@ -93,4 +93,3 @@ export function Timer({ timer, personName, onStop }: TimerProps) {
     </Card>
   )
 }
-
